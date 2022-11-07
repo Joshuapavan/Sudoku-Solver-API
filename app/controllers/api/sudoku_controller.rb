@@ -85,7 +85,7 @@ end
 
 def solve
   board = params[:data]
-  zero_array= findemptySpacesArray(board)
+  zero_array= findemptySpaces(board)
   solved_board = solveSudoku(board, zero_array)
   render json: {solution: solved_board.to_a.map(&:inspect)}
 end
