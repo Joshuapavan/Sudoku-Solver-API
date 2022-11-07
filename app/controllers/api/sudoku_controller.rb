@@ -1,15 +1,15 @@
 class Api::SudokuController < ApplicationController
 
-def findZeros(board)
-  zeros = []
+def findEmptySpaces(board)
+  emptySpaces = []
   for row in 0...board.length
     for column in 0...board[row].length
-      if (board[row][column] == 0 || board[row][column] == "null")
-        zeros << [row, column]
+      if (board[row][column] == 0 || board[row][column] == nil)
+        emptySpaces.push([row, column])
       end
     end
   end
-  return zeros
+  return emptySpaces
 end
 
 def isNumberInRow(board, row, number)
@@ -32,13 +32,13 @@ def isNumberInColumn(board, column, number)
 end
 
 def isNumberInBlock(board, row, column, number)
-  lower_row = 3 * (row / 3)
-  lower_column = 3 * (column / 3)
-  upper_row = lower_row + 3
-  upper_column = lower_column + 3
+  lowerRow = 3 * (row / 3)
+  lowerColumn = 3 * (column / 3)
+  upperRow = lowerRow + 3
+  upperColumn = lowerColumn + 3
 
-  for row in lower_row...upper_row
-    for column in lower_column...upper_column
+  for row in lowerRow...upperRow
+    for column in lowerColumn...upperColumn
       if (board[row][column] == number)
         return false
       end
@@ -58,11 +58,11 @@ def isValidPlacement(board, row, column, number)
 end
 
 
-def solveSudoku(board, zeros)
+def solveSudoku(board, emptySpacesArray)
   i = 0
-  while (i < zeros.length)
-    row = zeros[i][0]
-    column = zeros[i][1]
+  while (i < emptySpacesArray.length)
+    row = emptySpacesArray[i][0]
+    column = emptySpacesArray[i][1]
     number = board[row][column] + 1
     found = false
 
@@ -75,19 +75,17 @@ def solveSudoku(board, zeros)
         number += 1
       end
     end
-
     if !found
       board[row][column] = 0
       i -= 1
     end
-
   end
   return board
 end
 
 def solve
-  board = params[:data].to_a
-  zero_array= findZeros(board)
+  board = params[:data]
+  zero_array= findemptySpacesArray(board)
   solved_board = solveSudoku(board, zero_array)
   render json: {solution: solved_board.to_a.map(&:inspect)}
 end
